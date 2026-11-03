@@ -12,6 +12,8 @@ pub struct Font {
     pub stretch: Stretch,
     /// The [`Style`] of the [`Font`].
     pub style: Style,
+    /// The space added after each character, in thousandths of an em.
+    pub letter_spacing_milli_em: u16,
 }
 
 impl Font {
@@ -21,6 +23,7 @@ impl Font {
         weight: Weight::Normal,
         stretch: Stretch::Normal,
         style: Style::Normal,
+        letter_spacing_milli_em: 0,
     };
 
     /// A monospaced font with normal [`Weight`].
@@ -58,6 +61,14 @@ impl Font {
     /// Sets the [`Style`] of the [`Font`].
     pub const fn style(self, style: Style) -> Self {
         Self { style, ..self }
+    }
+
+    /// Sets the letter spacing of the [`Font`], in thousandths of an em.
+    pub const fn letter_spacing_milli_em(self, letter_spacing_milli_em: u16) -> Self {
+        Self {
+            letter_spacing_milli_em,
+            ..self
+        }
     }
 }
 

@@ -293,11 +293,25 @@ pub fn align(
 
 /// Returns the attributes of the given [`Font`].
 pub fn to_attributes(font: Font) -> cosmic_text::Attrs<'static> {
-    cosmic_text::Attrs::new()
+    let attributes = cosmic_text::Attrs::new()
         .family(to_family(font.family))
         .weight(to_weight(font.weight))
         .stretch(to_stretch(font.stretch))
-        .style(to_style(font.style))
+        .style(to_style(font.style));
+
+    if font.letter_spacing_milli_em == 0 {
+        return attributes;
+    }
+
+    // Browsers turn ligatures off when a text has letter spacing.
+    let mut features = cosmic_text::FontFeatures::new();
+    let _ = features
+        .disable(cosmic_text::FeatureTag::STANDARD_LIGATURES)
+        .disable(cosmic_text::FeatureTag::CONTEXTUAL_LIGATURES);
+
+    attributes
+        .letter_spacing(f32::from(font.letter_spacing_milli_em) / 1000.0)
+        .font_features(features)
 }
 
 fn to_family(family: font::Family) -> cosmic_text::Family<'static> {
