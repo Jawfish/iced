@@ -41,6 +41,12 @@ pub enum Event {
     /// Only some platforms report it, such as Wayland. A mouse wheel does
     /// not send it.
     WheelStopped,
+
+    /// Two or more fingers came to rest on the touchpad, with no movement.
+    /// It is the usual signal to stop a kinetic scroll.
+    ///
+    /// Only some platforms report it, such as Wayland.
+    WheelHeld,
 }
 
 /// A scroll movement.

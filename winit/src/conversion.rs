@@ -297,6 +297,10 @@ pub fn window_event(
         }
         WindowEvent::HoveredFileCancelled => Some(Event::Window(window::Event::FilesHoveredLeft)),
         WindowEvent::Touch(touch) => Some(Event::Touch(touch_event(touch, scale_factor))),
+        WindowEvent::HoldGesture {
+            phase: winit::event::TouchPhase::Started,
+            ..
+        } => Some(Event::Mouse(mouse::Event::WheelHeld)),
         WindowEvent::Moved(position) => {
             let winit::dpi::LogicalPosition { x, y } = position.to_logical(f64::from(scale_factor));
 
