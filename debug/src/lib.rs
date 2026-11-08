@@ -334,11 +334,24 @@ mod internal {
 }
 
 #[cfg(any(not(feature = "enable"), target_arch = "wasm32"))]
+#[cfg_attr(not(feature = "tracing"), allow(unused_variables))]
 mod internal {
     use crate::core::theme::palette;
     use crate::core::window;
     use crate::futures::Subscription;
     use crate::{Command, Metadata, Primitive};
+
+    macro_rules! span {
+        ($($field:tt)*) => {{
+            #[cfg(feature = "tracing")]
+            let span = Span {
+                _entered: tracing::info_span!(target: "iced", $($field)*).entered(),
+            };
+            #[cfg(not(feature = "tracing"))]
+            let span = Span {};
+            span
+        }};
+    }
 
     pub fn enable() {}
     pub fn disable() {}
@@ -358,51 +371,56 @@ mod internal {
     pub fn layers_rendered(_amount: impl FnOnce() -> usize) {}
 
     pub fn boot() -> Span {
-        Span
+        span!("boot")
     }
 
     pub fn update(_message: &impl std::fmt::Debug) -> Span {
-        Span
+        span!("update")
     }
 
-    pub fn view(_window: window::Id) -> Span {
-        Span
+    pub fn view(window: window::Id) -> Span {
+        span!("view", window = ?window)
     }
 
-    pub fn layout(_window: window::Id) -> Span {
-        Span
+    pub fn layout(window: window::Id) -> Span {
+        span!("layout", window = ?window)
     }
 
-    pub fn interact(_window: window::Id) -> Span {
-        Span
+    pub fn interact(window: window::Id) -> Span {
+        span!("interact", window = ?window)
     }
 
-    pub fn draw(_window: window::Id) -> Span {
-        Span
+    pub fn draw(window: window::Id) -> Span {
+        span!("draw", window = ?window)
     }
 
-    pub fn prepare(_primitive: Primitive) -> Span {
-        Span
+    pub fn prepare(primitive: Primitive) -> Span {
+        span!("prepare", primitive = ?primitive)
     }
 
-    pub fn render(_primitive: Primitive) -> Span {
-        Span
+    pub fn render(primitive: Primitive) -> Span {
+        span!("render", primitive = ?primitive)
     }
 
-    pub fn present(_window: window::Id) -> Span {
-        Span
+    pub fn present(window: window::Id) -> Span {
+        span!("present", window = ?window)
     }
 
-    pub fn time(_name: impl Into<String>) -> Span {
-        Span
+    pub fn time(name: impl Into<String>) -> Span {
+        span!("time", name = name.into())
     }
 
     pub fn commands() -> Subscription<Command> {
         Subscription::none()
     }
 
+    /// With the `tracing` feature, a stage is a `tracing` span at the `INFO`
+    /// level with the target `iced`, open until it finishes.
     #[derive(Debug)]
-    pub struct Span;
+    pub struct Span {
+        #[cfg(feature = "tracing")]
+        _entered: tracing::span::EnteredSpan,
+    }
 
     impl Span {
         pub fn finish(self) {}

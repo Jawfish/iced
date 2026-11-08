@@ -13,11 +13,15 @@ keywords.workspace = true
 [features]
 enable = ["dep:iced_beacon"]
 hot = ["enable", "dep:cargo-hot"]
+# Each stage of a frame is a `tracing` span, when the debug metrics are off.
+tracing = ["dep:tracing"]
 
 [dependencies]
 iced_core.workspace = true
 iced_futures.workspace = true
 log.workspace = true
+tracing.workspace = true
+tracing.optional = true
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 iced_beacon.workspace = true

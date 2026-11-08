@@ -43,6 +43,8 @@ qr_code = ["iced_widget/qr_code"]
 markdown = ["iced_widget/markdown"]
 # Enables debug metrics in native platforms (press F12)
 debug = ["iced_winit/debug", "dep:iced_devtools"]
+# Emits each stage of a frame (view, layout, draw, present) as a `tracing` span
+tracing-spans = ["iced_debug/tracing"]
 # Enables time-travel debugging (very experimental!)
 time-travel = ["debug", "iced_devtools/time-travel"]
 # Enables hot reloading (very experimental!)
