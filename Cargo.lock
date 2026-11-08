@@ -2278,6 +2278,7 @@ dependencies = [
  "iced_core",
  "iced_futures",
  "log",
+ "tracing",
 ]
 
 [[package]]

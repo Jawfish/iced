@@ -1053,12 +1053,30 @@ async fn run_instance<P>(
                         } else {
                             window.state.update(&program, &window.raw, &window_event);
 
+                            // The last scroll of a touchpad gesture comes
+                            // with the phase `Ended`, which `WheelScrolled`
+                            // does not carry.
+                            let is_wheel_stop = matches!(
+                                window_event,
+                                winit::event::WindowEvent::MouseWheel {
+                                    phase: winit::event::TouchPhase::Ended,
+                                    ..
+                                }
+                            );
+
                             if let Some(event) = conversion::window_event(
                                 window_event,
                                 window.state.scale_factor(),
                                 window.state.modifiers(),
                             ) {
                                 events.push((id, event));
+                            }
+
+                            if is_wheel_stop {
+                                events.push((
+                                    id,
+                                    crate::core::Event::Mouse(mouse::Event::WheelStopped),
+                                ));
                             }
                         }
                     }

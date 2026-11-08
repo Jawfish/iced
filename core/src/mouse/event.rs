@@ -33,6 +33,14 @@ pub enum Event {
         /// The scroll movement.
         delta: ScrollDelta,
     },
+
+    /// The fingers left the touchpad that scrolled: the scroll gesture
+    /// ended. It comes after the last [`Event::WheelScrolled`] of the
+    /// gesture.
+    ///
+    /// Only some platforms report it, such as Wayland. A mouse wheel does
+    /// not send it.
+    WheelStopped,
 }
 
 /// A scroll movement.
