@@ -98,6 +98,7 @@ where
                 ime_state: None,
                 last_frame: None,
                 frame_burst: 0,
+                screenshots: Vec::new(),
             },
         );
 
@@ -199,6 +200,10 @@ where
     ime_state: Option<(Rectangle, input_method::Purpose)>,
     last_frame: Option<Instant>,
     frame_burst: usize,
+    /// The screenshots that wait for the next frame: the layers of the last
+    /// frame can point at text that a layout since replaced, so a screenshot
+    /// is taken from a fresh frame, as the window shows it.
+    pub screenshots: Vec<crate::futures::futures::channel::oneshot::Sender<core::window::Screenshot>>,
 }
 
 struct FrameClock {

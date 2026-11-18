@@ -935,6 +935,20 @@ async fn run_instance<P>(
 
                         window.draw_preedit();
 
+                        for channel in window.screenshots.drain(..) {
+                            let bytes = current_compositor.screenshot(
+                                &mut window.renderer,
+                                window.state.viewport(),
+                                window.state.background_color(),
+                            );
+
+                            let _ = channel.send(core::window::Screenshot::new(
+                                bytes,
+                                window.state.physical_size(),
+                                window.state.scale_factor(),
+                            ));
+                        }
+
                         let present_span = debug::present(id);
                         match current_compositor.present(
                             &mut window.renderer,
@@ -1573,20 +1587,11 @@ fn run_action<'a, P, C>(
                 }
             }
             window::Action::Screenshot(id, channel) => {
-                if let Some(window) = window_manager.get_mut(id)
-                    && let Some(compositor) = compositor
-                {
-                    let bytes = compositor.screenshot(
-                        &mut window.renderer,
-                        window.state.viewport(),
-                        window.state.background_color(),
-                    );
-
-                    let _ = channel.send(core::window::Screenshot::new(
-                        bytes,
-                        window.state.physical_size(),
-                        window.state.scale_factor(),
-                    ));
+                // The next frame takes it: the layers of the last frame can
+                // point at text that a layout since replaced.
+                if let Some(window) = window_manager.get_mut(id) {
+                    window.screenshots.push(channel);
+                    window.raw.request_redraw();
                 }
             }
             window::Action::EnableMousePassthrough(id) => {
